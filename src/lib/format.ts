@@ -1,33 +1,30 @@
+import { partsInOfficeTz } from "./tz";
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
 export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  return `${y}/${m}/${day} ${hh}:${mm}`;
+  const p = partsInOfficeTz(d);
+  return `${p.year}/${pad(p.month)}/${pad(p.day)} ${pad(p.hour)}:${pad(p.minute)}`;
 }
 
 export function formatTime(iso: string | null | undefined): string {
   if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  const ss = String(d.getSeconds()).padStart(2, "0");
-  return `${hh}:${mm}:${ss}`;
+  const p = partsInOfficeTz(d);
+  return `${pad(p.hour)}:${pad(p.minute)}:${pad(p.second)}`;
 }
 
 export function formatDate(date: string | null | undefined): string {
   if (!date) return "—";
-  const d = new Date(date.length === 10 ? date + "T00:00:00" : date);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date.replace(/-/g, "/");
+  const d = new Date(date);
   if (Number.isNaN(d.getTime())) return date;
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}/${m}/${day}`;
+  const p = partsInOfficeTz(d);
+  return `${p.year}/${pad(p.month)}/${pad(p.day)}`;
 }
 
 export function formatHours(hours: number): string {

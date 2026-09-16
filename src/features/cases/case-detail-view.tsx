@@ -176,7 +176,7 @@ export function CaseDetailView({ detail, initialTab }: { detail: CaseDetail; ini
                   <tbody>
                     {detail.auditLogs.map((l) => (
                       <TR key={l.id}>
-                        <TD className="font-mono text-[11px] text-slate-500">{formatDateTime(l.timestamp)} {formatTime(l.timestamp).slice(-2)}</TD>
+                        <TD className="font-mono text-[11px] text-slate-500">{formatDateTime(l.timestamp).slice(0, 10)} {formatTime(l.timestamp)}</TD>
                         <TD className="text-[12px]">{l.actor}</TD>
                         <TD className="font-mono text-[11px]">{l.action}</TD>
                         <TD className="font-mono text-[11px] text-slate-500">{l.resourceId}</TD>

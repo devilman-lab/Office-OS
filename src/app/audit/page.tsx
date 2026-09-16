@@ -6,7 +6,7 @@ import { AUDIT_ACTIONS } from "@/domain/enums";
 import { PageHeader, Card, CardHeader, CardBody, Table, THead, TH, TR, TD, Badge, EmptyState, StatCard } from "@/components/ui/primitives";
 import { ResultBadge } from "@/components/ui/status";
 import { AuditFilters } from "@/features/audit/audit-filters";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { prepareDb } from "@/db/snapshot";
 
@@ -36,7 +36,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
               <tbody>
                 {logs.map((l) => (
                   <TR key={l.id} className={cn(l.result === "denied" && "bg-red-50/40")}>
-                    <TD><div className="font-mono text-[11.5px] text-slate-700">{formatDateTime(l.timestamp)}:{new Date(l.timestamp).getSeconds().toString().padStart(2, "0")}</div><div className="font-mono text-[10px] text-slate-400">{l.id}</div></TD>
+                    <TD><div className="font-mono text-[11.5px] text-slate-700">{formatDateTime(l.timestamp).slice(0, 10)} {formatTime(l.timestamp)}</div><div className="font-mono text-[10px] text-slate-400">{l.id}</div></TD>
                     <TD><div className="text-[12px] text-slate-800">{l.actor}</div><Badge tone={l.actorType === "human" ? "brand" : l.actorType === "ai" ? "violet" : "neutral"} mono>{l.actorType}</Badge></TD>
                     <TD><span className={cn("font-mono text-[11.5px] font-semibold", l.result === "denied" ? "text-red-700" : "text-slate-800")}>{l.action}</span></TD>
                     <TD><div className="text-[11px] text-slate-500">{l.resourceType}</div><div className="font-mono text-[11px] text-slate-700">{l.resourceId ?? "—"}</div></TD>

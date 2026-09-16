@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { dateOnlyInOfficeTz } from "./tz";
 
 export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
@@ -14,11 +15,9 @@ export function addDays(date: Date, days: number): Date {
   return d;
 }
 
+/** YYYY-MM-DD in the office timezone (Asia/Tokyo), identical on server and client. */
 export function toDateOnly(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  return dateOnlyInOfficeTz(date);
 }
 
 export function todayDateOnly(): string {
