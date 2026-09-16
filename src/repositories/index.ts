@@ -1,0 +1,11 @@
+export { customerRepository } from "./customer.repository";
+export { caseRepository } from "./case.repository";
+export { taskRepository } from "./task.repository";
+export { interactionRepository } from "./interaction.repository";
+export { knowledgeRepository } from "./knowledge.repository";
+export { proposalRepository } from "./proposal.repository";
+export { auditRepository } from "./audit.repository";
+export { permissionRepository } from "./permission.repository";
+export { settingsRepository } from "./settings.repository";
+export { inboxRepository } from "./inbox.repository";
+export { integrationRepository } from "./integration.repository";
