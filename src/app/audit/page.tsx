@@ -8,8 +8,10 @@ import { ResultBadge } from "@/components/ui/status";
 import { AuditFilters } from "@/features/audit/audit-filters";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { prepareDb } from "@/db/snapshot";
 
 export default async function AuditPage({ searchParams }: { searchParams: Promise<{ action?: string; result?: string; actorType?: string; q?: string }> }) {
+  await prepareDb();
   const sp = await searchParams;
   db();
   const logs = auditRepository.list({ action: sp.action || undefined, result: sp.result || undefined, actorType: sp.actorType || undefined, q: sp.q || undefined, limit: 300 });

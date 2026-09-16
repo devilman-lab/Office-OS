@@ -6,8 +6,10 @@ import { ReadOnlyBadge, VerifiedBadge } from "@/components/ui/status";
 import { Markdown } from "@/features/knowledge/markdown";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { prepareDb } from "@/db/snapshot";
 
 export default async function KnowledgePage({ searchParams }: { searchParams: Promise<{ doc?: string; category?: string }> }) {
+  await prepareDb();
   const { doc, category } = await searchParams;
   const kb = await getKnowledgeBrowser(doc, category);
   const selected = kb.selected;

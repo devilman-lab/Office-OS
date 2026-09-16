@@ -8,8 +8,10 @@ import { PageHeader, Card, CardHeader, CardBody, Badge, KeyValue, SectionLabel }
 import { PermissionBadge } from "@/components/ui/status";
 import { SettingsControls } from "@/features/settings/settings-controls";
 import { formatDateTime } from "@/lib/format";
+import { prepareDb } from "@/db/snapshot";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  await prepareDb();
   db();
   const s = settingsRepository.all();
   const ai = getAIProvider();

@@ -1,8 +1,10 @@
 import { listIntegrations } from "@/services/integration.service";
 import { PageHeader, Badge, Notice } from "@/components/ui/primitives";
 import { IntegrationCards } from "@/features/integrations/integration-cards";
+import { prepareDb } from "@/db/snapshot";
 
-export default function IntegrationsPage() {
+export default async function IntegrationsPage() {
+  await prepareDb();
   const integrations = listIntegrations();
   return (
     <div>

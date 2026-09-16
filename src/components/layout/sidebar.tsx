@@ -35,7 +35,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + "/");
 }
 
-export function Sidebar({ ephemeral = false }: { ephemeral?: boolean }) {
+export function Sidebar({ storage = "local-file" }: { storage?: "local-file" | "vercel-blob" | "ephemeral-tmp" | "snapshot-file" }) {
   const pathname = usePathname();
   const render = (items: typeof NAV_MAIN) =>
     items.map((item) => {
@@ -79,7 +79,8 @@ export function Sidebar({ ephemeral = false }: { ephemeral?: boolean }) {
           MOCK DATA — 架空データ
         </div>
         <div>外部サービスには接続していません</div>
-        {ephemeral && <div className="mt-1 text-amber-400/80">ホスティング環境のためデモデータは一時保存です（Reset Demo Data で復元）</div>}
+        {storage === "ephemeral-tmp" && <div className="mt-1 text-amber-400/80">Blob ストア未設定のためデモデータは一時保存です（Reset Demo Data で復元）</div>}
+        {storage === "vercel-blob" && <div className="mt-1 text-slate-500">デモデータ: Vercel Blob に保存（共有状態）</div>}
       </div>
     </aside>
   );

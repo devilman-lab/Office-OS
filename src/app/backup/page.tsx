@@ -6,8 +6,10 @@ import { knowledgeRepository } from "@/repositories";
 import { PageHeader, Card, CardHeader, CardBody, Badge, StatCard, Table, THead, TH, TR, TD, KeyValue } from "@/components/ui/primitives";
 import { BackupButton } from "@/features/settings/backup-button";
 import { formatDateTime } from "@/lib/format";
+import { prepareDb } from "@/db/snapshot";
 
-export default function BackupPage() {
+export default async function BackupPage() {
+  await prepareDb();
   db();
   const backups = listBackups();
   const last = backups[0];

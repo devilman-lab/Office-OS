@@ -1,7 +1,9 @@
 import { PageHeader, Badge } from "@/components/ui/primitives";
 import { DataFlowExplorer } from "@/features/architecture/data-flow-explorer";
+import { prepareDb } from "@/db/snapshot";
 
-export default function DataFlowPage() {
+export default async function DataFlowPage() {
+  await prepareDb();
   return (
     <div>
       <PageHeader eyebrow="Data Flow" title="データフロー" description="Input → Normalize → Mask → Classify → Retrieve → Generate → Validate → Human Review → Persist → Audit。各ステップで扱うデータと監査ログを確認できます。" badges={<Badge tone="violet" mono>PROTOTYPE</Badge>} />

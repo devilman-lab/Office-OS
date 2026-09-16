@@ -6,8 +6,10 @@ import { NotFoundError } from "@/domain/errors";
 import { PageHeader, Badge } from "@/components/ui/primitives";
 import { CaseStatusBadge, PriorityBadge, SourceBadge } from "@/components/ui/status";
 import { CaseDetailView } from "@/features/cases/case-detail-view";
+import { prepareDb } from "@/db/snapshot";
 
 export default async function CaseDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string }> }) {
+  await prepareDb();
   const { id } = await params;
   const { tab } = await searchParams;
   let detail;

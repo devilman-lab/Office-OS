@@ -23,10 +23,6 @@ export function resolveDbPath(): string {
   return path.resolve(/*turbopackIgnore: true*/ process.cwd(), configured);
 }
 
-export function isEphemeralStorage(): boolean {
-  return resolveDbPath().startsWith("/tmp");
-}
-
 export function openDatabase(file: string): DB {
   if (file !== ":memory:") {
     fs.mkdirSync(path.dirname(file), { recursive: true });

@@ -3,8 +3,10 @@ import { getEffectivenessMetrics } from "@/services/effectiveness.service";
 import { PageHeader, Card, CardHeader, CardBody, Badge, StatCard, Notice, SectionLabel } from "@/components/ui/primitives";
 import { formatMinutes } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { prepareDb } from "@/db/snapshot";
 
-export default function EffectivenessPage() {
+export default async function EffectivenessPage() {
+  await prepareDb();
   const m = getEffectivenessMetrics();
   const maxTrend = 13;
 

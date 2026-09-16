@@ -7,8 +7,10 @@ import { ConfidenceBadge, PriorityBadge, SourceBadge } from "@/components/ui/sta
 import { ResponsibleAINotice } from "@/components/ui/responsible-ai";
 import { formatDate, formatMinutes, formatTime, relativeTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { prepareDb } from "@/db/snapshot";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  await prepareDb();
   const m = getDashboardMetrics();
   const maxPipeline = Math.max(...m.pipeline.map((p) => p.count), 1);
 

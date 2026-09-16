@@ -6,8 +6,10 @@ import { inboxRepository, proposalRepository } from "@/repositories";
 import { PageHeader, Badge } from "@/components/ui/primitives";
 import { InboxStatusBadge, SourceBadge } from "@/components/ui/status";
 import { InboxProcessor } from "@/features/inbox/inbox-processor";
+import { prepareDb } from "@/db/snapshot";
 
 export default async function InboxItemPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ run?: string }> }) {
+  await prepareDb();
   const { id } = await params;
   const { run } = await searchParams;
   db();

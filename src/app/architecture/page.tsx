@@ -1,6 +1,7 @@
 import { Mail, MessageSquare, Mic, ArrowDown, Lock, Database, UserCheck, ScrollText, Cpu, EyeOff, Layers, ArrowRight } from "lucide-react";
 import { PageHeader, Card, CardHeader, CardBody, Badge, SectionLabel } from "@/components/ui/primitives";
 import { cn } from "@/lib/utils";
+import { prepareDb } from "@/db/snapshot";
 
 function Box({ title, sub, tone = "neutral", icon, className }: { title: string; sub?: string; tone?: "neutral" | "brand" | "amber" | "violet" | "emerald" | "dark"; icon?: React.ReactNode; className?: string }) {
   const cls = {
@@ -43,7 +44,8 @@ const EVOLUTION = [
   { component: "Auth", prototype: "固定ユーザー", mvp: "Google Workspace SSO", production: "SSO + ロール別権限" },
 ];
 
-export default function ArchitecturePage() {
+export default async function ArchitecturePage() {
+  await prepareDb();
   return (
     <div>
       <PageHeader eyebrow="System Architecture" title="システム構成" description="外部ソース → 入力処理 → 匿名化 → AI/エージェント → ナレッジ（Obsidian）と業務データ（Notion）の分離 → 人間の承認 → 監査。" badges={<Badge tone="violet" mono>PROTOTYPE ARCHITECTURE</Badge>} />

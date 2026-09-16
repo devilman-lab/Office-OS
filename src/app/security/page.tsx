@@ -8,6 +8,7 @@ import { PermissionBadge } from "@/components/ui/status";
 import { ResponsibleAINotice } from "@/components/ui/responsible-ai";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { prepareDb } from "@/db/snapshot";
 
 const PRINCIPLES = [
   { n: 1, en: "Knowledge Source is immutable from AI.", ja: "ナレッジ正本（Obsidian）は AI から変更できません。", icon: Lock },
@@ -20,7 +21,8 @@ const PRINCIPLES = [
   { n: 8, en: "Business data and knowledge data are separated.", ja: "業務データ（Notion）とナレッジ（Obsidian）は分離されています。", icon: Split },
 ];
 
-export default function SecurityPage() {
+export default async function SecurityPage() {
+  await prepareDb();
   db();
   const s = settingsRepository.all();
   const ai = getAIProvider();

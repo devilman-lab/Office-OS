@@ -7,6 +7,7 @@ import { PriorityBadge, TaskStatusBadge } from "@/components/ui/status";
 import { TaskStatusSelect } from "@/features/cases/task-status-select";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { prepareDb } from "@/db/snapshot";
 
 const VIEWS = [
   { key: "today", label: "Today", ja: "今日" },
@@ -19,6 +20,7 @@ const VIEWS = [
 type ViewKey = (typeof VIEWS)[number]["key"];
 
 export default async function TasksPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
+  await prepareDb();
   const { view } = await searchParams;
   const active: ViewKey = VIEWS.some((v) => v.key === view) ? (view as ViewKey) : "today";
   const all = listTasks();

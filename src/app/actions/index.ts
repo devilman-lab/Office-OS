@@ -15,12 +15,15 @@ import { globalSearch } from "@/services/search.service";
 import { settingsRepository } from "@/repositories";
 import { audit } from "@/audit/audit-logger";
 import { db } from "@/db";
+import { prepareDb, persistDb } from "@/db/snapshot";
 
 export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: { code: string; message: string; details?: unknown } };
 
-async function wrap<T>(fn: () => Promise<T> | T, revalidate = true): Promise<ActionResult<T>> {
+async function wrap<T>(fn: () => Promise<T> | T, revalidate = true, persist = true): Promise<ActionResult<T>> {
   try {
+    await prepareDb();
     const data = await fn();
+    if (persist) await persistDb();
     if (revalidate) revalidatePath("/", "layout");
     return { ok: true, data };
   } catch (err) {
@@ -94,5 +97,5 @@ export async function resetDemoAction() {
 
 /* ---- Search ---- */
 export async function globalSearchAction(q: string) {
-  return wrap(() => globalSearch(q), false);
+  return wrap(() => globalSearch(q), false, false);
 }

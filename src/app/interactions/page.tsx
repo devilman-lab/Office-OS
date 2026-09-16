@@ -6,8 +6,10 @@ import { PageHeader, Card, Table, THead, TH, TR, TD, Badge, EmptyState } from "@
 import { SourceBadge } from "@/components/ui/status";
 import { formatDateTime } from "@/lib/format";
 import { truncate } from "@/lib/utils";
+import { prepareDb } from "@/db/snapshot";
 
-export default function InteractionsPage() {
+export default async function InteractionsPage() {
+  await prepareDb();
   const rows = listInteractions();
   return (
     <div>

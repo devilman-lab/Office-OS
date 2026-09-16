@@ -8,8 +8,10 @@ import { buttonClass } from "@/components/ui/button-class";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { ResponsibleAINotice } from "@/components/ui/responsible-ai";
 import { proposalDisplayTitle } from "@/features/proposal/display";
+import { prepareDb } from "@/db/snapshot";
 
-export default function ApprovalsPage() {
+export default async function ApprovalsPage() {
+  await prepareDb();
   db();
   const proposals = proposalRepository.list();
   const customers = new Map(customerRepository.list().map((c) => [c.id, c.displayName]));

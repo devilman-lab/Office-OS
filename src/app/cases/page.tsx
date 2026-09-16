@@ -6,8 +6,10 @@ import { PageHeader, Card, Table, THead, TH, TR, TD, Badge, EmptyState } from "@
 import { CaseStatusBadge, PriorityBadge, SourceBadge } from "@/components/ui/status";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { prepareDb } from "@/db/snapshot";
 
 export default async function CasesPage({ searchParams }: { searchParams: Promise<{ status?: string; customer?: string }> }) {
+  await prepareDb();
   const { status, customer } = await searchParams;
   const valid = CASE_STATUSES.includes(status as CaseStatus) ? (status as CaseStatus) : undefined;
   const rows = listCases({ status: valid }).filter((c) => !customer || c.customerId === customer);

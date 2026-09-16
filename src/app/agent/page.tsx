@@ -1,8 +1,10 @@
 import { PageHeader, Badge } from "@/components/ui/primitives";
 import { listAgentTools } from "@/services/agent.service";
 import { AgentConsole } from "@/features/agent/agent-console";
+import { prepareDb } from "@/db/snapshot";
 
-export default function AgentPage() {
+export default async function AgentPage() {
+  await prepareDb();
   const tools = listAgentTools();
   return (
     <div>

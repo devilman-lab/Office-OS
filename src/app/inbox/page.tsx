@@ -8,8 +8,10 @@ import { LinkButton } from "@/components/ui/button";
 import { buttonClass } from "@/components/ui/button-class";
 import { formatDateTime } from "@/lib/format";
 import { truncate } from "@/lib/utils";
+import { prepareDb } from "@/db/snapshot";
 
-export default function InboxPage() {
+export default async function InboxPage() {
+  await prepareDb();
   db();
   const items = inboxRepository.list();
   const unprocessed = items.filter((i) => i.aiStatus === "not_processed" || i.aiStatus === "failed").length;

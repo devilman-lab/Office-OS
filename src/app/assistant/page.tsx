@@ -3,8 +3,10 @@ import { AssistantChat } from "@/features/assistant/assistant-chat";
 import { SUGGESTED_QUESTIONS } from "@/services/assistant.service";
 import { isKnowledgeAvailable } from "@/services/integration.service";
 import { Notice } from "@/components/ui/primitives";
+import { prepareDb } from "@/db/snapshot";
 
-export default function AssistantPage() {
+export default async function AssistantPage() {
+  await prepareDb();
   const available = isKnowledgeAvailable();
   return (
     <div>

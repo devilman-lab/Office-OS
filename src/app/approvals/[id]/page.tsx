@@ -7,8 +7,10 @@ import { PageHeader, Badge } from "@/components/ui/primitives";
 import { ProposalStatusBadge } from "@/components/ui/status";
 import { ProposalReviewPanel } from "@/features/proposal/proposal-review-panel";
 import { proposalDisplayTitle } from "@/features/proposal/display";
+import { prepareDb } from "@/db/snapshot";
 
 export default async function ProposalReviewPage({ params }: { params: Promise<{ id: string }> }) {
+  await prepareDb();
   const { id } = await params;
   let review;
   try {

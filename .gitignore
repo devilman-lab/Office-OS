@@ -8,3 +8,4 @@ data/backups
 .env*
 !.env.example
 scripts/e2e/shots
+data/snapshot

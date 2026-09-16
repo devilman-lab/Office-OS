@@ -223,21 +223,27 @@ npm run build && npm start
 
 ## 18. Deploy to Vercel (via GitHub)
 
-Vercel の Serverless 環境ではデプロイ物が読み取り専用のため、SQLite は自動的に **`/tmp/urizun-os.db`** に作成され、コールドスタート時にシードされます（`src/db/client.ts`）。
+Vercel の Serverless 環境ではデプロイ物が読み取り専用で、しかもリクエストごとに別インスタンスへ振り分けられることがあります。
+そのため本アプリは **SQLite をメモリ上で動かし、その DB イメージ（約 170 KB）を Vercel Blob に保存して各リクエストで同期**します（`src/db/snapshot.ts`）。
+リポジトリ層の同期 API はそのままで、ページ／Server Action の入口で `prepareDb()`（最新スナップショット取得）と `persistDb()`（更新後のアップロード）を行います。
 
-- デモデータは **サーバーインスタンスごとの一時保存** です。しばらくアクセスがないとインスタンスが破棄され、初期状態に戻ることがあります（画面左下に注意書きを表示）。デモ中は同一インスタンスで継続するため通常は問題ありません。
+### 手順
+
+1. GitHub に push
+   ```bash
+   git add -A
+   git commit -m "OfficeうりずんOS prototype"
+   git branch -M main
+   git remote add origin https://github.com/<you>/<repo>.git
+   git push -u origin main
+   ```
+2. Vercel で **Add New Project** → リポジトリを選択 → Deploy（Next.js は自動検出）
+3. **Blob ストアを作成して接続**（必須）: Vercel ダッシュボード → プロジェクト → **Storage** → **Create Database** → **Blob** → 作成後 **Connect Project**。環境変数 `BLOB_READ_WRITE_TOKEN` が自動追加されます。
+4. **Redeploy**（環境変数を反映するため）。左下の表示が「デモデータ: Vercel Blob に保存（共有状態）」になれば完了です。
+
+Blob 未接続のままだと `/tmp` の一時 DB で動き、インスタンスが切り替わったときに「ページが見つかりません」になります（左下に警告を表示）。
+
+### 補足
 - `vercel.json` でリージョンを東京（`hnd1`）に固定しています。
-- 環境変数の設定は不要です（既定で Mock AI / Local Markdown / `/tmp` DB）。
-- Node.js は 20 以上（Vercel の既定 22.x で動作。`better-sqlite3` はプリビルドが使われます）。
-
-手順:
-
-```bash
-git add -A
-git commit -m "OfficeうりずんOS prototype"
-git branch -M main
-git remote add origin https://github.com/<you>/<repo>.git
-git push -u origin main
-```
-
-Vercel で「Add New Project」→ GitHub リポジトリを選択 → Framework: Next.js（自動検出）→ Deploy。
+- スナップショットは 1 ストアに 1 つ（`urizun-os/snapshot.db`）。同時に複数人が操作する用途ではなく、デモ用途の設計です。
+- ローカルで同じ仕組みを試す場合: `URIZUN_SNAPSHOT_STORE=file npm run build && npm start`（`data/snapshot/` に保存）。
