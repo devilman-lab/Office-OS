@@ -26,6 +26,30 @@ interface SnapshotStore {
 
 const BLOB_PATH = "urizun-os/snapshot.db";
 
+/**
+ * Blob access level. Vercel Blob stores are created as "private" by default; set URIZUN_BLOB_ACCESS=public for a public store.
+ * If the store rejects the configured level, the other one is tried once and remembered.
+ */
+const accessState = globalThis as unknown as { __urizunBlobAccess?: "public" | "private" };
+function blobAccess(): "public" | "private" {
+  return accessState.__urizunBlobAccess ?? (process.env.URIZUN_BLOB_ACCESS === "public" ? "public" : "private");
+}
+async function withAccessFallback<T>(fn: (access: "public" | "private") => Promise<T>): Promise<T> {
+  const first = blobAccess();
+  try {
+    return await fn(first);
+  } catch (err) {
+    const other = first === "public" ? "private" : "public";
+    try {
+      const result = await fn(other);
+      accessState.__urizunBlobAccess = other;
+      return result;
+    } catch {
+      throw err;
+    }
+  }
+}
+
 class VercelBlobStore implements SnapshotStore {
   async head(): Promise<SnapshotMeta | null> {
     const { head, BlobNotFoundError } = await import("@vercel/blob");
@@ -37,15 +61,18 @@ class VercelBlobStore implements SnapshotStore {
       throw err;
     }
   }
-  async get(meta: SnapshotMeta): Promise<Buffer> {
-    // The fingerprint in the query string defeats CDN caching of older versions.
-    const res = await fetch(`${meta.url}?v=${encodeURIComponent(meta.fingerprint)}`, { cache: "no-store" });
-    if (!res.ok) throw new Error(`snapshot download failed: ${res.status}`);
-    return Buffer.from(await res.arrayBuffer());
+  async get(): Promise<Buffer> {
+    // useCache:false reads from origin storage, so a freshly uploaded snapshot is never served stale.
+    const { get } = await import("@vercel/blob");
+    return withAccessFallback(async (access) => {
+      const res = await get(BLOB_PATH, { access, useCache: false });
+      if (!res || res.statusCode !== 200) throw new Error("snapshot download failed");
+      return Buffer.from(await new Response(res.stream).arrayBuffer());
+    });
   }
   async put(buffer: Buffer): Promise<SnapshotMeta> {
     const { put } = await import("@vercel/blob");
-    const blob = await put(BLOB_PATH, buffer, { access: "public", addRandomSuffix: false, allowOverwrite: true, contentType: "application/octet-stream" });
+    const blob = await withAccessFallback((access) => put(BLOB_PATH, buffer, { access, addRandomSuffix: false, allowOverwrite: true, contentType: "application/octet-stream" }));
     const meta = await this.head();
     return meta ?? { fingerprint: String(Date.now()), url: blob.url };
   }
@@ -92,6 +119,15 @@ export async function prepareDb(): Promise<DB> {
     ensureSeeded(handle);
     return handle;
   }
+  try {
+    return await hydrateFrom(s);
+  } catch (err) {
+    console.error("[snapshot] prepareDb failed:", err);
+    throw err;
+  }
+}
+
+async function hydrateFrom(s: SnapshotStore): Promise<DB> {
   const meta = await s.head();
   if (!meta) {
     const fresh = openDatabase(":memory:");
@@ -115,6 +151,11 @@ export async function prepareDb(): Promise<DB> {
 export async function persistDb(): Promise<void> {
   const s = store();
   if (!s) return;
-  const meta = await s.put(getDb().serialize());
-  state.__urizunSnapshotFp = meta.fingerprint;
+  try {
+    const meta = await s.put(getDb().serialize());
+    state.__urizunSnapshotFp = meta.fingerprint;
+  } catch (err) {
+    console.error("[snapshot] persistDb failed:", err);
+    throw err;
+  }
 }
